@@ -1,37 +1,35 @@
-- Check for your Ansible container:
- 
-  ```bash
-  sysadmin@Jump-Box-Provisioner:~$ sudo docker ps
-  CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
-  ```
 
-- Locate the container name:
+```bash
+$ cd /etc/ansible
+$ mkdir files
+# Clone Repository + IaC Files
+$ git clone https://github.com/yourusername/project-1.git
+# Move Playbooks and hosts file Into `/etc/ansible`
+$ cp project-1/playbooks/* .
+$ cp project-1/files/* ./files
+```
 
-  ```bash
-  sysadmin@Jump-Box-Provisioner:~$ sudo docker container list -a
-  CONTAINER ID        IMAGE                          COMMAND             CREATED             STATUS                      PORTS               NAMES                     
-  4d16db8c80d6        cyberxsecurity/ubuntu:bionic   "bash"              3 days ago          Exited (0) 3 days ago    											 romantic_noyce
-  ```
+This copies the playbook files to the correct place.
 
-- Start the container:
+Next, you must create a `hosts` file to specify which VMs to run each playbook on. Run the commands below:
 
-  ```bash
-  sysadmin@Jump-Box-Provisioner:~$ sudo docker container start romantic_noyce
-  romantic_noyce
-  sysadmin@Jump-Box-Provisioner:~$
-  ```
+```bash
+$ cd /etc/ansible
+$ cat > hosts <<EOF
+[webservers]
+10.0.0.5
+10.0.0.6
 
-- Connect to the Ansible container:
+[elk]
+10.0.0.8
+EOF
+```
 
-  ```bash
-  sysadmin@Jump-Box-Provisioner:~$ sudo docker container attach romantic_noyce
-  root@6160a9be360e:~#
-  ```
+After this, the commands below run the playbook:
 
-- Copy the SSH key from the Ansible container on your jump box:
-
-  ```bash
-    # cat ~/.ssh/id_rsa.pub 
-  ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDUfoIGFxTFyZXWV0QuCCmPKxsvGhnW/sKwGrOZ/K7nozKxsaRSCSG/oLGbugTyi9+fRY9wYWCmK/HLpjOaTEi8iU+ydvGM8nTloD/dIlje9PClUCxFQjql2XyQz32FqDjHV8rCZA+Pz+9ozc7BogQwLLg/0c4beQYbVQPKs1QGHf31YuXs6hAraJMXCx7VsDJHQwfv1kScE2s+yGeUJMt0ny3xaED8y2Pn+mBF2Tw7HLT+HPkmvXcuCkLxo6gY3ad+EH9Ko0r2AEFvtZTcFyGfIDLcS6jo+GUlKuCLGRAzeKNhq+D78fHf8Vt4qvUSIywP9HHnvnqfUCVKXsKxZGGl root@6160a9be360e
-
+ ```bash
+ $ cd /etc/ansible
+ $ ansible-playbook install_elk.yml elk
+ $ ansible-playbook install_filebeat.yml webservers
+ $ ansible-playbook install_metricbeat.yml webservers
 
